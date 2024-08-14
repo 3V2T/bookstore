@@ -17,7 +17,7 @@ const SelectInput = ({list, name, defaultValue, handleChoose}) => {
           onChange={handleChoose}
           className="select-input"
         >
-          <option value="">All</option>
+          {!defaultValue && <option value="">All</option>}
           {list.map((item) => {
             return (
               <option

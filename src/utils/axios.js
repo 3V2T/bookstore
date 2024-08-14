@@ -1,12 +1,12 @@
 import axios from 'axios'
-import { clearStore } from '../features/users/userSlice'
-const bookUrl = 'http://localhost:5000/api/v1'
+import { clearStore, logoutUser } from '../features/users/userSlice'
+
+const bookUrl = import.meta.env.VITE_APP_BASE_URL
 
 export const customFetch = axios.create({
   baseURL: bookUrl,
   withCredentials: true,
 })
-
 
 export const checkForUnauthorizedResponse = (error, thunkAPI) => {
   if (error.response.status === 401) {
@@ -15,6 +15,3 @@ export const checkForUnauthorizedResponse = (error, thunkAPI) => {
   }
   return thunkAPI.rejectWithValue(error.response.data.msg)
 }
-
-
-

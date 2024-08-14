@@ -117,6 +117,7 @@ const SingleBook = () => {
                 list={list}
                 name="Amount"
                 handleChoose={handleSelectAmount}
+                defaultValue={1}
               />
             </div>
             {/* SUBMIT BTN */}

@@ -7,6 +7,12 @@ import {
   quaternaryBgColor,
   quaternaryBgColorLight,
 } from '../../assets/js/variables'
+import { customFetch } from '../../utils/axios'
+
+export const loader = async () => {
+  const resp = await customFetch('books/findNewBooks')
+  return {newBooks: resp.data.newBooks}
+}
 
 const Home = () => {
   return (

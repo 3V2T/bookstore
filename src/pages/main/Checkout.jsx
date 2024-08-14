@@ -76,7 +76,6 @@ const Checkout = () => {
       user_id: user.userId,
       recipient_name: values.recipientName,
       recipient_phone: values.recipientPhoneNumber,
-      terms_accepted: values.termsAccepted,
     }
   
     if (order.payment_method === 'COD') {

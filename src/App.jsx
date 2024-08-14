@@ -19,6 +19,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { loader as libraryLoader } from './pages/main/Library'
 import { loader as verifyEmailLoader } from './pages/VerifyEmail'
 import { loader as singleBookLoader } from './pages/main/SingleBook'
+import { loader as newBookLoader} from './pages/main/Home'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Home />,
+        loader: newBookLoader,
         errorElement: <ErrorElement />,
       },
       { path: 'about', element: <About /> },
