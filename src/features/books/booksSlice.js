@@ -1,17 +1,17 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
-import { getAllBooksThunk } from './allBooksThunk'
+import { getAllBooksThunk, addBookThunk } from './booksThunk'
 
 const initialFiltersState = {
-      search: '',
-      categoryID: '',
-      publisherID: '',
-      authorID: '',
-      sort: 'latest',
+  search: '',
+  category: '',
+  publisher: '',
+  author: '',
+  sort: 'latest',
 }
 
 const initialState = {
-  isLoading: true,
+  isLoading: false,
   books: [],
   totalBooks: 0,
   numOfPages: 1,
@@ -19,14 +19,22 @@ const initialState = {
   ...initialFiltersState,
 }
 
-export const getAllBooks = createAsyncThunk('allBooks/getBooks', getAllBooksThunk)
+export const getAllBooks = createAsyncThunk(
+  'allBooks/getBooks',
+  getAllBooksThunk
+)
+export const addBook = createAsyncThunk(
+  'books/addBook',
+  async (book, thunkAPI) => {
+    return addBookThunk('/books', book, thunkAPI)
+  }
+)
 
-
-const allBooksSlice = createSlice({
-  name: 'filter',
+const booksSlice = createSlice({
+  name: 'allBooks',
   initialState,
   reducers: {
-    howLoading: (state) => {
+    showLoading: (state) => {
       state.isLoading = true
     },
     hideLoading: (state) => {
@@ -59,6 +67,17 @@ const allBooksSlice = createSlice({
         state.isLoading = false
         toast.error(payload)
       })
+      .addCase(addBook.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(addBook.fulfilled, (state) => {
+        state.isLoading = false
+        toast.success('Thêm sách thành công')
+      })
+      .addCase(addBook.rejected, (state) => {
+        state.isLoading = false
+        toast.error('Thêm sách thất bại')
+      })
   },
 })
 
@@ -69,5 +88,5 @@ export const {
   clearFilters,
   changePage,
   clearAllBooksState,
-} = allBooksSlice.actions
-export default allBooksSlice.reducer
+} = booksSlice.actions
+export default booksSlice.reducer

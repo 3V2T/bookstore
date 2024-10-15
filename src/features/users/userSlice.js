@@ -43,7 +43,7 @@ export const logoutUser = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   'user/updateUser',
   async (user, thunkAPI) => {
-    return updateUserThunk('/auth/updateUser', user, thunkAPI)
+    return updateUserThunk('/users/updateUser', user, thunkAPI)
   }
 )
 export const clearStore = createAsyncThunk('user/clearStore', clearStoreThunk)
@@ -110,7 +110,6 @@ const userSlice = createSlice({
         state.isLoading = false
         state.user = user
         addUserToLocalStorage(user)
-
         toast.success(`User Updated!`)
       })
       .addCase(updateUser.rejected, (state, { payload }) => {

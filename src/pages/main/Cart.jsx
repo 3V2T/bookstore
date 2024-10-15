@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { SectionTitle, CartTotals, CartItemsList } from '../../components'
+import { SectionTitle, CartTotal, CartItemsList } from '../../components'
 import styled from 'styled-components'
 import {
   quaternaryBgColorLight,
@@ -17,16 +17,15 @@ const Cart = () => {
     return (
       <Wrapper>
         <div className="d-flex justify-content-center align-items-center flex-column">
-          <SectionTitle text="Your cart is empty!" />
+          <h2>Giỏ hàng của bạn đang trống!</h2>
           <img src={emptyCart} alt="empty-cart" className="empty-cart-img" />
-          <SectionTitle text="Please put in some books" />
         </div>
       </Wrapper>
     )
 
   return (
     <Wrapper>
-      <SectionTitle text="Your Cart" />
+      <SectionTitle text="Giỏ hàng của bạn" />
       {/* chia thành 12 cột */}
       <div className="row cart-container">
         {/* Item chiếm 8 cột */}
@@ -36,14 +35,14 @@ const Cart = () => {
         {/* cart total chiếm 4 cột */}
         <div className="col-4 checkout-column">
           <div className="checkout-container">
-            <CartTotals />
+            <CartTotal />
             {user ? (
               <Link to="/checkout" className="btn">
-                proceed to checkout
+                Đặt hàng
               </Link>
             ) : (
               <Link to="/login" className="btn">
-                please login
+                Đăng nhập
               </Link>
             )}
           </div>
@@ -59,7 +58,7 @@ const Wrapper = styled.section`
   padding-bottom: 3rem;
   .cart-container {
     padding: 0 5rem;
-    margin-bottom: 2rem;
+    margin: 2rem 0rem;
   }
   .btn {
     color: ${textColor};
@@ -78,5 +77,8 @@ const Wrapper = styled.section`
   .checkout-container {
     position: sticky;
     top: 5rem;
+  }
+  h2 {
+    font-weight: bold;
   }
 `

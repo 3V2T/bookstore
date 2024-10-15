@@ -1,5 +1,17 @@
 import { customFetch, checkForUnauthorizedResponse } from '../../utils/axios'
 
+export const getAllOrdersThunk = async (_, thunkAPI) => {
+  const { page } = thunkAPI.getState().order
+  try {
+    const resp = await customFetch.get('/orders', {
+      params: { page },
+    })
+    return resp.data
+  } catch (error) {
+    return checkForUnauthorizedResponse(error, thunkAPI)
+  }
+}
+
 export const getUserOrderThunk = async (_, thunkAPI) => {
   const { page } = thunkAPI.getState().order
   try {
@@ -7,7 +19,7 @@ export const getUserOrderThunk = async (_, thunkAPI) => {
       params: { page },
     })
     return resp.data
-  } catch (e) {
+  } catch (error) {
     return checkForUnauthorizedResponse(error, thunkAPI)
   }
 }

@@ -2,11 +2,10 @@ import React from 'react'
 import Container from 'react-bootstrap/Container'
 import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
-import logo from '../assets/images/logo.png'
+import { logo } from '../assets/images'
 import { useSelector, useDispatch } from 'react-redux'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, NavLink } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import '../assets/scss/Navbar.scss'
 import styled from 'styled-components'
 import {
   primaryBgColorHover,
@@ -38,14 +37,13 @@ const MyNavbar = () => {
       <Navbar expand="lg" className="navbar-custom position-fixed">
         <Container className="position-relative">
           <Navbar.Brand
-            href="#home"
+            to="#home"
             className="py-0"
             style={{ height: '30px', width: '120px' }}
           >
             <img
               src={logo}
-              width="180"
-              height="40"
+              height="100%"
               className="d-inline-block position-absolute top-0 start-20"
               alt="book app logo"
             />
@@ -53,23 +51,46 @@ const MyNavbar = () => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mx-auto">
-              <Nav.Link href="/">Home</Nav.Link>
-              <Nav.Link href="/about">About</Nav.Link>
-              <Nav.Link href="/library">Library</Nav.Link>
-              <Nav.Link href="/cart">Cart</Nav.Link>
-              {user && <Nav.Link href="/checkout">Checkout</Nav.Link>}
-              {user && <Nav.Link href="/order">Order</Nav.Link>}
+              <NavLink className="nav-link" to="/">
+                Trang chủ
+              </NavLink>
+              <NavLink className="nav-link" to="/about">
+                Thông tin
+              </NavLink>
+              <NavLink className="nav-link" to="/library">
+                Kho sách
+              </NavLink>
+              {(user === null || user?.role === 'user') && (
+                <NavLink className="nav-link" to="/cart">
+                  Giỏ hàng
+                </NavLink>
+              )}
+              {user && user?.role === 'user' && (
+                <NavLink className="nav-link" to="/checkout">
+                  Thanh toán
+                </NavLink>
+              )}
+              {user && user?.role === 'user' && (
+                <NavLink className="nav-link" to="/order">
+                  Đơn hàng
+                </NavLink>
+              )}
+              {user && user?.role === 'admin' && (
+                <NavLink className="nav-link" to="/manager">
+                  Quản lý
+                </NavLink>
+              )}
             </Nav>
             {user ? (
               <Navbar.Text>
-                Hello, <a href="#login">{user.name}</a>
+                <a to="/user">{user.name}</a>
                 <button onClick={handleLogout} className="auth-btn">
-                  Logout
+                  Đăng xuất
                 </button>
               </Navbar.Text>
             ) : (
               <button className="auth-btn">
-                <Link to="/register">Login / Register</Link>
+                <Link to="/register">Đăng nhập / Đăng xuất</Link>
               </button>
             )}
           </Navbar.Collapse>
@@ -87,12 +108,12 @@ const Wrapper = styled.section`
     background-color: ${primaryBgColor}; /* Màu nền tùy chỉnh */
     box-shadow: ${shadow4};
     top: 0;
-    width: 100%;
+    width: 100vw;
     z-index: 10;
   }
   .navbar-custom .nav-link {
     color: ${secondaryBgColor};
-    margin: 0 5px;
+    margin: 0;
     border-radius: 10px;
   }
   .navbar-custom .nav-link:hover {

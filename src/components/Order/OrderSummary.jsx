@@ -1,39 +1,39 @@
-import { useSelector } from 'react-redux'
+import React from 'react'
 import styled from 'styled-components'
 import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
 import { formatPrice } from '../../utils'
 import {
   quaternaryBgColorLight,
-  quaternaryBgColor,
-  textColor,
   boldTextColor,
 } from '../../assets/js/variables'
 
-const CartTotals = () => {
-  const { cartTotal, shipping, tax, orderTotal } = useSelector(
-    (store) => store.cart
-  )
+const OrderSummary = ({ orderInfo }) => {
+  console.log(orderInfo)
+
   return (
     <Wrapper>
       <Card>
+        <Card.Header>
+          <h5>Thông tin đơn hàng</h5>
+        </Card.Header>
         <Card.Body>
           <ListGroup>
             <ListGroup.Item>
-              <span className="label">Subtotal</span>
-              <span>{formatPrice(cartTotal)}</span>
+              <span className="label">Tổng tiền hàng</span>
+              <span>{formatPrice(orderInfo.subtotal)}</span>
             </ListGroup.Item>
             <ListGroup.Item>
-              <span className="label">Shipping</span>
-              <span>{formatPrice(shipping)}</span>
+              <span className="label">Phí ship</span>
+              <span>{formatPrice(orderInfo.shipping_fee)}</span>
             </ListGroup.Item>
             <ListGroup.Item>
-              <span className="label">Tax</span>
-              <span>{formatPrice(tax)}</span>
+              <span className="label">Thuế</span>
+              <span>{formatPrice(orderInfo.tax)}</span>
             </ListGroup.Item>
             <ListGroup.Item className="last-item">
-              <span className="label">Order Total</span>
-              <span>{formatPrice(orderTotal)}</span>
+              <span className="label">Tổng thanh toán</span>
+              <span>{formatPrice(orderInfo.total)}</span>
             </ListGroup.Item>
           </ListGroup>
         </Card.Body>
@@ -41,21 +41,19 @@ const CartTotals = () => {
     </Wrapper>
   )
 }
-export default CartTotals
+
+export default OrderSummary
 
 const Wrapper = styled.section`
-margin-bottom: 1rem;
   .card {
-    background: ${quaternaryBgColorLight};
   }
   .list-group-item {
     display: flex;
     justify-content: space-between;
-    background: ${quaternaryBgColorLight};
     color: ${boldTextColor};
   }
   .last-item {
-    background: ${quaternaryBgColor};
+    background: ${quaternaryBgColorLight};
   }
   .label {
     font-weight: 500;

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FormInput } from '../../components/index'
+import { FormInput, RadiosInput } from '../../components/index'
 import { toast } from 'react-toastify'
 import { useDispatch, useSelector } from 'react-redux'
 import { loginUser, registerUser } from '../../features/users/userSlice'
@@ -11,7 +11,7 @@ import {
   quaternaryBgColor,
   quaternaryBgColorLight,
   primaryBgColorHover,
-  shadow1
+  shadow1,
 } from '../../assets/js/variables'
 
 const initialState = {
@@ -19,6 +19,7 @@ const initialState = {
   email: '',
   password: '',
   isMember: true,
+  gender: 'Nam'
 }
 
 function Register() {
@@ -26,6 +27,15 @@ function Register() {
   const { user, isLoading } = useSelector((store) => store.user)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const radios = document.getElementsByName('gender')
+    radios.forEach((radio) => {
+      if (radio.value === values.gender) {
+        radio.checked = true
+      }
+    })
+  }, [values.isMember, values.gender])
 
   const handleChange = (e) => {
     const name = e.target.name
@@ -35,7 +45,9 @@ function Register() {
   }
   const onSubmit = (e) => {
     e.preventDefault()
-    const { name, email, password, isMember } = values
+    const { name, email, password, isMember, gender } = values
+    console.log(values);
+    
     if (!email || !password || (!isMember && !name)) {
       toast.error('Please fill out all fields')
       return
@@ -44,7 +56,7 @@ function Register() {
       dispatch(loginUser({ email: email, password: password }))
       return
     }
-    dispatch(registerUser({ name, email, password }))
+    dispatch(registerUser({ name, email, password, gender }))
   }
 
   const toggleMember = () => {
@@ -61,20 +73,39 @@ function Register() {
   return (
     <Wrapper className="full-page">
       <form className="form" onSubmit={onSubmit}>
-        <h3>{values.isMember ? 'Login' : 'Register'}</h3>
+        <h3>{values.isMember ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ'}</h3>
         {/* name field */}
         {!values.isMember && (
           <FormInput
-          label="name"
+            label="Họ tên"
             type="text"
             name="name"
             value={values.name}
             handleChange={handleChange}
           />
         )}
+        {/* gender field */}
+        {!values.isMember && (
+          <div className="mb-2">
+            <h5 className="radio-label">Giới tính</h5>
+            <div className="gender-container">
+              {['Nam', 'Nữ', 'Khác'].map((gender) => {
+                return (
+                  <RadiosInput
+                    key={gender}
+                    name="gender"
+                    value={gender}
+                    label={gender}
+                    handleCheck={handleChange}
+                  />
+                )
+              })}
+            </div>
+          </div>
+        )}
         {/* email field */}
         <FormInput
-        label="email"
+          label="Email"
           type="email"
           name="email"
           value={values.email}
@@ -82,15 +113,19 @@ function Register() {
         />
         {/* password field */}
         <FormInput
-        label="password"
+          label="Mật khẩu"
           type="password"
           name="password"
           value={values.password}
           handleChange={handleChange}
         />
-        <div className='btn-container'>
+        <div className="btn-container">
           <Button type="submit" className="btn" disabled={isLoading}>
-            {isLoading ? 'loading...' : 'submit'}
+            {isLoading
+              ? 'loading...'
+              : values.isMember
+              ? 'Đăng nhập'
+              : 'Đăng ký'}
           </Button>
           <Button
             className="btn"
@@ -105,9 +140,9 @@ function Register() {
           </Button>
         </div>
         <p>
-          {values.isMember ? 'Not a member yet?' : 'Already a member?'}
+          {values.isMember ? 'Chưa có tài khoản?' : 'Đã có tài khoản?'}
           <Button onClick={toggleMember} className="member-btn">
-            {values.isMember ? 'Register' : 'Login'}
+            {values.isMember ? 'Đăng ký' : 'Đăng nhập'}
           </Button>
         </p>
       </form>
@@ -156,6 +191,7 @@ const Wrapper = styled.section`
     color: ${primaryBgColor};
   }
   .member-btn {
+    margin-bottom: 5px;
     background: transparent;
     border: transparent;
     color: ${primaryBgColor};
@@ -167,5 +203,15 @@ const Wrapper = styled.section`
     display: flex;
     justify-content: center;
     gap: 2rem;
+  }
+
+  .gender-container {
+    gap: 1rem;
+    display: flex;
+    flex-direction: row;
+  }
+  .radio-label {
+    font-size: 1rem;
+    font-weight: normal;
   }
 `

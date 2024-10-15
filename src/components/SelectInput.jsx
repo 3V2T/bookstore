@@ -1,50 +1,60 @@
-import React from 'react'
-import styled from 'styled-components'
+import React from "react";
+import styled from "styled-components";
 import {
   textColor,
   boldTextColor,
   quaternaryBgColor,
-} from '../assets/js/variables'
+} from "../assets/js/variables";
 
-const SelectInput = ({list, name, defaultValue, handleChoose}) => {
+const SelectInput = ({
+  list,
+  name,
+  defaultValue,
+  handleChoose,
+  label,
+  disabled,
+}) => {
   return (
     <Wrapper>
       <div>
-        <h5 className="select-label">{name}</h5>
+        <h5 className="select-label">{label}</h5>
         <select
+          disabled={disabled}
           name={name}
           defaultValue={defaultValue}
           onChange={handleChoose}
           className="select-input"
         >
-          {!defaultValue && <option value="">All</option>}
-          {list.map((item) => {
+          {!defaultValue && <option value={""}>--</option>}
+          {defaultValue && <option value="null">Tất cả</option>}
+          {list?.map((item) => {
             return (
               <option
                 className="select-item"
                 key={item.id}
+                name={item.name}
                 value={item.id}
               >
                 {item.name}
               </option>
-            )
+            );
           })}
         </select>
       </div>
     </Wrapper>
-  )
-}
+  );
+};
 
 const Wrapper = styled.section`
   .select-label {
     color: ${boldTextColor};
-    font-weight: bold;
+    font-size: 1rem;
   }
-  
+
   .select-input {
     background-color: ${quaternaryBgColor};
     border-radius: 0.5rem;
     margin-bottom: 1rem;
   }
-`
-export default SelectInput
+`;
+export default SelectInput;

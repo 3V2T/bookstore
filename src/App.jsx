@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import {
   SharedLayout,
   Home,
@@ -7,19 +7,32 @@ import {
   Register,
   Checkout,
   SingleBook,
+  SingleAuthor,
   Cart,
-  Order
-} from './pages/main'
-import VerifyEmail from './pages/VerifyEmail'
-import { ProtectedRoute, Error } from './pages'
-import { ErrorElement } from './components'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+  Order,
+  UserInfo,
+  Manager,
+  SingleOrder,
+  CreationPage,
+  Coupon,
+  ClassifyBook,
+} from "./pages/main";
+import VerifyEmail from "./pages/VerifyEmail";
+import { ProtectedRoute, Error } from "./pages";
+import { ErrorElement } from "./components";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-import { loader as libraryLoader } from './pages/main/Library'
-import { loader as verifyEmailLoader } from './pages/VerifyEmail'
-import { loader as singleBookLoader } from './pages/main/SingleBook'
-import { loader as newBookLoader} from './pages/main/Home'
+import { action as couponAction } from "./pages/main/Manage/Coupon";
+
+import { loader as couponLoader } from "./pages/main/Manage/Coupon";
+import { loader as libraryLoader } from "./pages/main/Library";
+import { loader as verifyEmailLoader } from "./pages/VerifyEmail";
+import { loader as singleBookLoader } from "./pages/main/SingleBook";
+import { loader as singleAuthorLoader } from "./pages/main/SingleAuthor";
+import { loader as newBookLoader } from "./pages/main/Home";
+import { loader as singleUserOrder } from "./pages/main/SingleOrder";
+import store from "./store";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,11 +40,11 @@ const queryClient = new QueryClient({
       staleTime: 5 * 60 * 1000,
     },
   },
-})
+});
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <SharedLayout />,
     children: [
       {
@@ -40,18 +53,23 @@ const router = createBrowserRouter([
         loader: newBookLoader,
         errorElement: <ErrorElement />,
       },
-      { path: 'about', element: <About /> },
+      { path: "about", element: <About /> },
       {
-        path: 'library',
+        path: "library",
         element: <Library />,
         loader: libraryLoader(queryClient),
       },
       {
-        path: 'cart',
+        path: "library/:id",
+        element: <SingleBook />,
+        loader: singleBookLoader(queryClient),
+      },
+      {
+        path: "cart",
         element: <Cart />,
       },
       {
-        path: 'checkout',
+        path: "checkout",
         element: (
           <ProtectedRoute>
             <Checkout />
@@ -59,7 +77,29 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'order',
+        path: "order/:id",
+        element: (
+          <ProtectedRoute>
+            <SingleOrder />
+          </ProtectedRoute>
+        ),
+        loader: singleUserOrder(store, queryClient),
+      },
+      {
+        path: "author/:id",
+        element: <SingleAuthor />,
+        loader: singleAuthorLoader(queryClient),
+      },
+      {
+        path: "user",
+        element: (
+          <ProtectedRoute>
+            <UserInfo />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "order",
         element: (
           <ProtectedRoute>
             <Order />
@@ -67,24 +107,59 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'library/:id',
-        element: <SingleBook />,
-        loader: singleBookLoader(queryClient),
+        path: "manager",
+        element: (
+          <ProtectedRoute>
+            <Manager />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            index: true,
+            element: <CreationPage />,
+          },
+          {
+            path: "order",
+            element: (
+              <ProtectedRoute>
+                <Order />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "class",
+            element: (
+              <ProtectedRoute>
+                <ClassifyBook />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "coupon",
+            element: (
+              <ProtectedRoute>
+                <Coupon />
+              </ProtectedRoute>
+            ),
+            loader: couponLoader(queryClient),
+            action: couponAction,
+          },
+        ],
       },
     ],
   },
   {
-    path: '/register',
+    path: "/register",
     element: <Register />,
     errorElement: <Error />,
   },
   {
-    path: '/user/verify-email',
+    path: "/user/verify-email",
     element: <VerifyEmail />,
     loader: verifyEmailLoader,
     errorElement: <Error />,
   },
-])
+]);
 
 const App = () => {
   return (
@@ -92,6 +167,6 @@ const App = () => {
       <RouterProvider router={router} />
       <ReactQueryDevtools initialIsOpen={true} />
     </QueryClientProvider>
-  )
-}
-export default App
+  );
+};
+export default App;

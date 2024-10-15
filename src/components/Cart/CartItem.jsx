@@ -9,6 +9,7 @@ import {
   quaternaryBgColorLight,
   shadow1,
 } from '../../assets/js/variables'
+import { formatPrice } from '../../utils'
 
 const CartItem = ({ cartItem }) => {
   const dispatch = useDispatch()
@@ -54,10 +55,10 @@ const CartItem = ({ cartItem }) => {
             handleChoose={handleAmount}
           />
           <a className="remove-btn" onClick={removeItemFromTheCart}>
-            remove
+            Xóa
           </a>
         </div>
-        <h3 className="col-3 price-tag text-center">{`${price}$`}</h3>
+        <h3 className="col-3 price-tag text-center">{`${formatPrice(price)}`}</h3>
       </div>
     </Wrapper>
   )
@@ -68,9 +69,7 @@ const Wrapper = styled.article`
   border-top: solid 2px ${primaryBgColorHover};
   padding: 1rem 0rem;
   .cart-item-img {
-    max-height: 8rem;
-    max-width: 8rem;
-    object-fit: cover;
+    width: 8rem;
   }
   .info {
   }

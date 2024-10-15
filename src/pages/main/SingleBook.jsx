@@ -1,19 +1,17 @@
 import { useLoaderData, Link } from 'react-router-dom'
 import { useState } from 'react'
 import { addItem } from '../../features/cart/cartSlice'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { customFetch } from '../../utils/axios'
-import { MyBreadCrumb, SelectInput } from '../../components'
+import { CommentSection, MyBreadCrumb, SelectInput } from '../../components'
 import {
-  boldTextColor,
-  primaryBgColor,
-  primaryBgColorHover,
-  quaternaryBgColor,
   quaternaryBgColorLight,
   shadow1,
   textColor,
 } from '../../assets/js/variables'
+import { formatPrice } from '../../utils'
+import StarRatings from 'react-star-ratings'
 
 // Query function
 const singleBookQuery = (id) => {
@@ -24,21 +22,35 @@ const singleBookQuery = (id) => {
   }
 }
 
+const singleBookReviewQuery = (id) => {
+  // trả về query object
+  return {
+    queryKey: ['singleBookReviewQuery', id || ''],
+    queryFn: () => customFetch(`/reviews/books/${id}`),
+  }
+}
+
 //loader
 export const loader =
   (queryClient) =>
   async ({ params }) => {
     const { id } = params
-    const response = await queryClient.ensureQueryData(singleBookQuery(id))
-    const book = response.data.book
-    return { book }
+    const [responseBook, responseReviews] = await Promise.all([
+      queryClient.ensureQueryData(singleBookQuery(id)),
+      queryClient.ensureQueryData(singleBookReviewQuery(id)),
+    ])
+    const book = responseBook.data.book
+    const reviews = responseReviews.data.reviews
+    return { book, reviews }
   }
 
 const SingleBook = () => {
   const defaultImg = 'https://via.placeholder.com/150'
   // data
-  const { book } = useLoaderData()
+  const { user } = useSelector((store) => store.user)
+  const { book, reviews } = useLoaderData()
   const {
+    id: book_id,
     book_img,
     title,
     price,
@@ -47,6 +59,9 @@ const SingleBook = () => {
     publisher,
     author,
     category,
+    author_id,
+    page_number,
+    average_rating,
   } = book
   //  generate option
   const list = Array.from({ length: available_copies }, (_, i) => ({
@@ -75,6 +90,7 @@ const SingleBook = () => {
     category,
     publisher,
     available_copies,
+    page_number,
   }
   // Add to cart function
   const addToCart = () => {
@@ -82,8 +98,8 @@ const SingleBook = () => {
   }
 
   const breadcrumbItems = [
-    { label: 'Home', path: '/', active: false },
-    { label: 'Library', path: '/library', active: false },
+    { label: 'Trang chủ', path: '/', active: false },
+    { label: 'Nhà sách', path: '/library', active: false },
     { label: title, path: `/${title}`, active: true },
   ]
 
@@ -105,31 +121,62 @@ const SingleBook = () => {
           <div className="col-sm-6 col-12">
             {/* INFORMATION */}
             <h2 className="">{title}</h2>
-            <p className="author-name">{author.name}</p>
+            <Link
+              className="author-link"
+              key={author_id}
+              to={`/author/${author_id}`}
+            >
+              <p className="author-name">{author.name}</p>
+            </Link>
+            <div className="d-flex align-items-center gap-3">
+              <StarRatings
+                rating={Number(average_rating) || 0}
+                starRatedColor="green"
+                numberOfStars={5}
+                name="rating"
+                starDimension="22px"
+              />
+              <p style={{ paddingTop: '6px' }}>{Number(average_rating) || 0}</p>
+            </div>
+            {/* basic info */}
             <div className="basic-info">
-              <p className="publisher-name">{`Publisher: ${publisher.name}`}</p>
-              <p className="category">{`Genre: ${category.name}`}</p>
-              <p className="price">{`Price: ${price}$`}</p>
+              <p className="publisher-name">{`Nhà xuất bản: ${publisher.name}`}</p>
+              <p className="category">{`Thể loại: ${category.name}`}</p>
+              <p className="page-number">{`Số trang: ${page_number}`}</p>
+              <p className="price">
+                Giá bán: <span className="fw-bold">{formatPrice(price)}</span>
+              </p>
+              {user?.role === 'admin' && (
+                <p className="book-amount ">
+                  Số lượng hiện có:{' '}
+                  <span className="fw-bold">{available_copies} quyển</span>
+                </p>
+              )}
             </div>
             {/* AMOUNT */}
-            <div className="">
-              <SelectInput
-                list={list}
-                name="Amount"
-                handleChoose={handleSelectAmount}
-                defaultValue={1}
-              />
-            </div>
+            {user?.role !== 'admin' && (
+              <div className="">
+                <SelectInput
+                  list={list}
+                  name="Amount"
+                  handleChoose={handleSelectAmount}
+                  defaultValue={1}
+                />
+              </div>
+            )}
             {/* SUBMIT BTN */}
-            <button className="btn" onClick={addToCart}>
-              Add to bag
-            </button>
+            {user?.role !== 'admin' && (
+              <button className="btn" onClick={addToCart}>
+                Thêm vào giỏ hàng
+              </button>
+            )}
           </div>
         </div>
         <div className="row">
           <p className="description">{description}</p>
         </div>
       </div>
+      <CommentSection book_id={book_id} reviews={reviews} />
     </Wrapper>
   )
 }
@@ -141,6 +188,7 @@ const Wrapper = styled.section`
     margin-top: 5rem;
     max-width: 100vw;
     padding: 3rem;
+    padding-bottom: 0;
   }
   .row {
     gap: 4rem;
@@ -151,7 +199,6 @@ const Wrapper = styled.section`
   }
   .book-img {
     border-radius: 2rem;
-    height: 24rem;
     width: 24rem;
   }
   .author-name {
@@ -169,6 +216,8 @@ const Wrapper = styled.section`
     letter-spacing: 0.05rem;
     padding: 0 6rem;
     text-align: justify;
+    font-size: 1.25rem;
+    font-weight: normal;
   }
   .basic-info {
     margin: 1rem 0;
@@ -199,5 +248,12 @@ const Wrapper = styled.section`
   .first-row {
     margin-bottom: 1.5rem;
     padding-left: 5rem;
+  }
+  .author-link {
+    text-decoration: none;
+  }
+  .author-link:hover {
+    text-decoration: underline;
+    text-decoration-color: ${textColor};
   }
 `

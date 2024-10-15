@@ -6,10 +6,10 @@ import {
 } from '../assets/js/variables'
 import styled from 'styled-components'
 
-const ListInput = ({ list, name, handleChoose }) => {
+const ListInput = ({ label, list, name, handleChoose }) => {
   return (
     <Wrapper>
-      <h5 className="list-label">{name}</h5>
+      <h5 className="list-label">{label}</h5>
       <div className="list-input d-flex flex-column">
         {list.map((item) => {
           return (
@@ -30,6 +30,7 @@ const ListInput = ({ list, name, handleChoose }) => {
 }
 
 const Wrapper = styled.section`
+  margin-top: 1rem;
   .list-input {
     margin-bottom: 1rem;
   }
@@ -50,6 +51,7 @@ const Wrapper = styled.section`
   .list-label {
     color: ${boldTextColor};
     font-weight: bold;
+    text-transform: none;
   }
 `
 

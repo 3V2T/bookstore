@@ -1,5 +1,7 @@
-import React from 'react'
-import Form from 'react-bootstrap/Form'
+import React from "react";
+import Form from "react-bootstrap/Form";
+import styled from "styled-components";
+import { boldTextColor, quaternaryBgColorLight } from "../assets/js/variables";
 
 const FormInput = ({
   label,
@@ -9,13 +11,14 @@ const FormInput = ({
   value,
   placeholder,
   handleChange,
+  size,
+  disabled,
 }) => {
   return (
-    <div className="mb-2">
-      <Form.Label htmlFor={label} style={{ textTransform: 'capitalize' }}>
-        {label}
-      </Form.Label>
+    <Wrapper className="mb-2">
+      <Form.Label htmlFor={label}>{label}</Form.Label>
       <Form.Control
+        disabled={disabled}
         type={type}
         id={name}
         name={name}
@@ -23,9 +26,16 @@ const FormInput = ({
         placeholder={placeholder}
         onChange={handleChange}
         value={value}
+        size={size}
       />
-    </div>
-  )
-}
+    </Wrapper>
+  );
+};
 
-export default FormInput
+export default FormInput;
+
+const Wrapper = styled.section`
+  input {
+    background-color: ${quaternaryBgColorLight};
+  }
+`;

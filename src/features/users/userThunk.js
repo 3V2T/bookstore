@@ -1,12 +1,11 @@
 import { customFetch, checkForUnauthorizedResponse } from '../../utils/axios'
-import { clearAllBooksState } from '../books/allBooksSlice'
+import { clearAllBooksState } from '../books/booksSlice'
 import { clearUserOrderState } from '../orders/orderSlice'
 import { clearUserInfo } from './userSlice'
 
 export const registerUserThunk = async (url, user, thunkAPI) => {
   try {
     const resp = await customFetch.post(url, user)
-
     return resp.data
   } catch (error) {
     const message = error.response?.data?.msg || 'Register failed!'
@@ -17,8 +16,6 @@ export const registerUserThunk = async (url, user, thunkAPI) => {
 export const loginUserThunk = async (url, user, thunkAPI) => {
   try {
     const resp = await customFetch.post(url, user)
-    console.log(resp)
-
     return resp.data
   } catch (error) {
     const message = error.response?.data?.msg || 'Login error!'
@@ -28,7 +25,13 @@ export const loginUserThunk = async (url, user, thunkAPI) => {
 
 export const updateUserThunk = async (url, user, thunkAPI) => {
   try {
-    const resp = await customFetch.patch(url, user)
+     const formData = new FormData()
+     formData.append('name', user.name)
+     formData.append('phone_number', user.phone_number)
+     formData.append('gender', user.gender)
+     formData.append('address', user.address)
+     formData.append('user_img', user.user_img)
+    const resp = await customFetch.patch(url, formData)
     return resp.data
   } catch (error) {
     return checkForUnauthorizedResponse(error, thunkAPI)
@@ -54,6 +57,7 @@ export const logoutUserThunk = async (url, thunkAPI) => {
     const resp = await customFetch.delete(`${url}`)
     return resp.data
   } catch (error) {
-    return checkForUnauthorizedResponse(error, thunkAPI)
+     const message = error.response?.data?.msg || 'Logout error!'
+     return thunkAPI.rejectWithValue(message)
   }
 }
